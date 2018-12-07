@@ -21,5 +21,7 @@ export class KeyValueStore {
     return true
   }
 
-  checkAndSet() {}
+  checkAndSet({ key, expectedValue, newValue }) {
+    throw new Error('not implemented')
+  }
 }
