@@ -13,15 +13,22 @@ export class KeyValueStore {
     return this.store[key]
   }
 
+  exists(key) {
+    return !(this.get(key) == undefined)
+  }
+
   delete(key) {
-    if (this.get(key) == undefined) 
-      return false
+    if (!this.exists(key)) return false
       
     this.store[key] = undefined
     return true
   }
 
   checkAndSet({ key, expectedValue, newValue }) {
-    throw new Error('not implemented')
+    if (this.get(key) == expectedValue) {
+      this.set(key, newValue)
+      return true
+    }
+    return false
   }
 }

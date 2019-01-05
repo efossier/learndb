@@ -17,6 +17,10 @@ const tests = () => {
     beforeEach(() => {
       // Before each test, create a new instance of the key-value store.
       keyValueStore = new KeyValueStore()
+
+      // This won't do anything for now, but will be helpful soon when we have
+      // to initialize resources such as database files.
+      keyValueStore.init()
     })
 
     // The point of checkAndSet() is to let us avoid accidentally clobbering data
