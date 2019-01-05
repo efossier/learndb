@@ -1,26 +1,49 @@
+import shell from 'shelljs'
+import fs from 'fs'
+import path from 'path'
+import md5 from 'md5'
+import tmp from 'tmp'
+
 export class KeyValueStore {
-  constructor() {
-    this.store = {}
+  constructor(conf = {}) {
+    this.dbPath = conf.dbPath || tmp.dirSync().name
   }
 
-  init() {}
+  init() {
+    shell.mkdir('-p', this.dbPath)
+  }
 
   set(key, val) {
-    this.store[key] = val
+    let filePath = this._getFilePath(key)
+    let data = JSON.stringify({'key': key, 'val': val})
+    fs.writeFileSync(filePath, data)
   }
 
   get(key) {
-    return this.store[key]
+    let filePath = this._getFilePath(key)
+    try {
+      let content = fs.readFileSync(filePath)
+      let data = JSON.parse(content)
+      if (data.key != key) {
+        return undefined
+      }
+      return data.val
+    } catch (e) {
+      // File does not exist or malformed
+      return undefined
+    }
   }
 
   exists(key) {
-    return !(this.get(key) == undefined)
+    let filePath = this._getFilePath(key)
+    return fs.existsSync(filePath)
   }
 
   delete(key) {
     if (!this.exists(key)) return false
       
-    this.store[key] = undefined
+    let filePath = this._getFilePath(key)
+    fs.unlinkSync(filePath)
     return true
   }
 
@@ -30,5 +53,13 @@ export class KeyValueStore {
       return true
     }
     return false
+  }
+
+  clear() {
+    shell.rm('-rf', this.dbPath)
+  }
+
+  _getFilePath(key) {
+    return path.join(this.dbPath, `${md5(key)}.json`)
   }
 }

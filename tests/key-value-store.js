@@ -3,9 +3,13 @@ import chaiString from 'chai-string'
 
 import { KeyValueStore } from '../src/key-value-store'
 
+import shell from 'shelljs'
+import path from 'path'
+
 chai.use(chaiString)
 
 describe('KeyValueStore', () => {
+  const testDBDir = path.resolve(__dirname, '../testDB')
   // Test keys and values we'll use in the new tests
   const testKey1 = 'test-key-1'
   const testValue1 = 'test-value-1'
@@ -16,11 +20,16 @@ describe('KeyValueStore', () => {
 
   beforeEach(() => {
     // Before each test, create a new instance of the key-value store.
-    keyValueStore = new KeyValueStore()
+    keyValueStore = new KeyValueStore({dbPath: testDBDir})
 
     // This won't do anything for now, but will be helpful soon when we have
     // to initialize resources such as database files.
     keyValueStore.init()
+  })
+
+  afterEach(() => {
+    // Clear the KV Store after every test
+    keyValueStore.clear()
   })
 
   it('get() returns value that was set()', () => {

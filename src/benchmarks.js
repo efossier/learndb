@@ -28,6 +28,7 @@ function run() {
     })
     .on('complete', function() {
       const endingRss = process.memoryUsage().rss
+      keyValueStore.clear()
       console.log(`Ending RSS memory usage: ${bytesToMB(endingRss)} MB`)
       console.log(`Difference: ${bytesToMB(endingRss - startingRss)} MB`)
     })
