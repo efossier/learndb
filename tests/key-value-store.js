@@ -12,19 +12,26 @@ describe('KeyValueStore', () => {
   const testDBDir = path.resolve(__dirname, '../testDB')
   // Test keys and values we'll use in the new tests
   const testKey1 = 'test-key-1'
+  const testKey1 = 'test-key-2'
   const testValue1 = 'test-value-1'
   const testValue2 = 'test-value-2'
 
   // Contains a fresh instance of the key-value store for each test.
   let keyValueStore = null
 
-  beforeEach(() => {
-    // Before each test, create a new instance of the key-value store.
-    keyValueStore = new KeyValueStore({dbPath: testDBDir})
+  function newKVStore({ dbPath }) {
+    let kv = new KeyValueStore({dbPath: dbPath})
 
     // This won't do anything for now, but will be helpful soon when we have
     // to initialize resources such as database files.
-    keyValueStore.init()
+    kv.init()
+
+    return kv
+  }
+
+  beforeEach(() => {
+    // Before each test, create a new instance of the key-value store.
+    keyValueStore = newKVStore({dbPath: testDBDir})
   })
 
   afterEach(() => {
@@ -65,5 +72,23 @@ describe('KeyValueStore', () => {
 
   it('delete() returns false if key did not exist', () => {
     assert.equal(keyValueStore.delete("abc"), false)
+  })
+
+  it('delete() does not impact other keys', () => {
+    keyValueStore.set(testKey1, testValue1)
+    keyValueStore.delete(testKey1)
+    keyValueStore.set(testKey2, testValue2)
+    assert.equal(keyValueStore.get(testKey2), testValue2)
+  })
+
+  it('persists data', () => {
+    keyValueStore.set("evan", "rocks")
+    assert.equal(keyValueStore.get("evan"), "rocks")
+
+    let otherKVStore = newKVStore({ dbPath: testDBDir })
+    assert.equal(otherKVStore.get("evan"), "rocks")
+
+    otherKVStore.set("evan", "dope")
+    assert.equal(keyValueStore.get("evan"), "dope")
   })
 })
