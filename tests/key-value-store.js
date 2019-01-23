@@ -12,7 +12,7 @@ describe('KeyValueStore', () => {
   const testDBDir = path.resolve(__dirname, '../testDB')
   // Test keys and values we'll use in the new tests
   const testKey1 = 'test-key-1'
-  const testKey1 = 'test-key-2'
+  const testKey2 = 'test-key-2'
   const testValue1 = 'test-value-1'
   const testValue2 = 'test-value-2'
 
@@ -84,11 +84,29 @@ describe('KeyValueStore', () => {
   it('persists data', () => {
     keyValueStore.set("evan", "rocks")
     assert.equal(keyValueStore.get("evan"), "rocks")
+    keyValueStore.flush()
 
     let otherKVStore = newKVStore({ dbPath: testDBDir })
     assert.equal(otherKVStore.get("evan"), "rocks")
 
     otherKVStore.set("evan", "dope")
+    otherKVStore.flush()
+
     assert.equal(keyValueStore.get("evan"), "dope")
+  })
+
+  it('buffers correctly', () => {
+    keyValueStore.clear()
+    keyValueStore = new KeyValueStore({dbPath: testDBDir, maxBufferLength: 2})
+    keyValueStore.init()
+
+    keyValueStore.set("evan", "dope")
+    keyValueStore.set("nave", "epod")
+    keyValueStore.set("nave1", "epod1")
+    keyValueStore.set("evan", "sick")
+
+    assert.equal(keyValueStore.get("evan"), "sick")
+    assert.equal(keyValueStore.get("nave"), "epod")
+    assert.equal(keyValueStore.get("nave1"), "epod1")
   })
 })
