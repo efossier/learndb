@@ -1,0 +1,10 @@
+
+> @learndb/learndb@0.1.1 benchmarks /Users/evan/Documents/Code/learndb
+> node --require @babel/register src/benchmarks.js
+
+Starting RSS memory usage: 57.797 MB
+KeyValueStore#set x 618 ops/sec ±10.57% (19 runs sampled)
+KeyValueStore#get x 1,445 ops/sec ±1.41% (82 runs sampled)
+KeyValueStore#delete x 23,428 ops/sec ±0.45% (89 runs sampled)
+Ending RSS memory usage: 82.109 MB
+Difference: 24.313 MB
